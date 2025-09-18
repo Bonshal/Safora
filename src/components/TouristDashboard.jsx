@@ -204,7 +204,7 @@ export function TouristDashboard({ onLogout }) {
           
           <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden">
             <ImageWithFallback 
-              src="https://images.unsplash.com/photo-1652176862396-99e525e9f87b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwc2t5bGluZSUyMHVyYmFuJTIwdHJhdmVsfGVufDF8fHx8MTc1ODA5NjYyM3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+              src="/fake-map.png"
               alt="Map view"
               className="w-full h-full object-cover"
             />
@@ -227,7 +227,7 @@ export function TouristDashboard({ onLogout }) {
         <Card className="p-4">
           <h3 className="font-medium mb-3 flex items-center gap-2">
             <Shield className="h-5 w-5 text-emerald-600" />
-            Today's Safety Tips
+            000000
           </h3>
           <div className="space-y-2">
             <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg">
