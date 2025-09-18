@@ -68,7 +68,7 @@ export function TouristDashboard({ onLogout }) {
               <Menu className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="font-semibold text-gray-900">SafeGuide</h1>
+              <h1 className="font-semibold text-gray-900">Safora</h1>
               <p className="text-sm text-gray-500 flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {currentLocation}
@@ -110,12 +110,12 @@ export function TouristDashboard({ onLogout }) {
             </Badge>
           </div>
           
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             {riskAlerts.map((alert, index) => (
               <Alert key={index} className={`border ${getRiskColor(alert.level)}`}>
                 <div className="flex items-start gap-3">
                   {getRiskIcon(alert.type)}
-                  <div className="flex-1">
+                  <div className="flex-1 ">
                     <AlertDescription className="text-sm">
                       <div className="font-medium mb-1">{alert.area}</div>
                       {alert.message}
@@ -127,7 +127,30 @@ export function TouristDashboard({ onLogout }) {
                 </div>
               </Alert>
             ))}
+
+          </div> */}
+
+
+
+             <div className="space-y-3">
+            {riskAlerts.map((alert, index) => (
+              <Alert key={index} className={`border ${getRiskColor(alert.level)}`}>
+                {getRiskIcon(alert.type)}
+                <AlertDescription>
+                  <div className="flex items-start justify-between w-full">
+                    <div className="flex-1">
+                      <div className="font-medium mb-2 text-gray-900">{alert.area}</div>
+                      <div className="text-gray-700 leading-relaxed">{alert.message}</div>
+                    </div>
+                    <Badge variant="outline" className={`text-xs ml-3 flex-shrink-0 ${getRiskColor(alert.level)}`}>
+                      {alert.level}
+                    </Badge>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            ))}
           </div>
+
         </Card>
 
         {/* Weather & Air Quality */}

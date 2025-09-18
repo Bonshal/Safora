@@ -7,9 +7,16 @@ import { TouristDashboard } from './components/TouristDashboard.jsx';
 import { AdminDashboard } from './components/AdminDashboard.jsx';
 
 export default function App() {
-  const [user, setUser] = useState(null);
-  const [appState, setAppState] = useState('landing');
+  const [user, setUser] = useState({
+    type: 'tourist',
+    email: 'test@gmail.com'
+  });
+  const [appState, setAppState] = useState('logged-in');
 
+  //hard code start
+ 
+  //hard core end
+ 
   const handleGetStarted = () => {
     console.log('Get start clicked')
     setAppState('welcome');
