@@ -43,7 +43,7 @@ export function AdminLogin({ onLogin, onBack }) {
             Admin Access
           </h1>
           <p className="text-gray-600">
-            Secure login for system administrators
+            Secure login for system Administrators
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export function AdminLogin({ onLogin, onBack }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="admin-email" className="block text-sm font-medium text-gray-700 mb-2">
-                ADMIN EMAIL
+                ADMIN ID
               </label>
               <Input
                 id="admin-email"
@@ -82,7 +82,7 @@ export function AdminLogin({ onLogin, onBack }) {
 
             <div className="text-right">
               <span className="text-sm text-blue-600 cursor-pointer hover:underline">
-                Contact System Administrator
+                Forgot Credentials
               </span>
             </div>
 

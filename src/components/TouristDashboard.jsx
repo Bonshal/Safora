@@ -4,6 +4,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Alert, AlertDescription } from './ui/alert';
+
 import { 
   MapPin, 
   AlertTriangle, 
@@ -17,27 +18,49 @@ import {
   User,
   Thermometer,
   Droplets,
-  Eye
+  Eye,
+  Phone,
+  Heart
 } from 'lucide-react';
+
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export function TouristDashboard({ onLogout }) {
   const [searchLocation, setSearchLocation] = useState('');
-  const [currentLocation] = useState('Tokyo, Japan');
+  const [currentLocation] = useState('Mawsynram, Meghalaya');
   
   // Mock data for demonstration
   const riskAlerts = [
-    { type: 'weather', level: 'high', message: 'Heavy rainfall expected in next 6 hours', area: 'Shibuya District' },
-    { type: 'crime', level: 'medium', message: 'Increased pickpocket activity reported', area: 'Tourist areas' },
+    { type: 'weather', level: 'high', message: 'Heavy rainfall expected in next 6 hours', area: 'Mawsynram' },
+    { type: 'crime', level: 'medium', message: 'Safe', area: 'Tourist areas' },
     { type: 'natural', level: 'low', message: 'Earthquake monitoring - stable conditions', area: 'All areas' }
   ];
+
+
 
   const weatherData = {
     temperature: 24,
     humidity: 68,
     condition: 'Partly cloudy',
     visibility: '10 km',
-    airQuality: 'Good'
+    airQuality: 'Good',
+    AQI: 90
+  };
+
+  //emergency services mock data
+   const emergencyServices = {
+    police: {
+      name: 'Sohra Police Station',
+      distance: '3 km',
+      address: 'Sohra, cheeranpunji',
+      phone: '+91-3-3498-0110'
+    },
+    hospital: {
+      name: 'Shillong Civil hospital',
+      distance: '5 km',
+      address: 'HV9J+3CW, Laban, Lachumiere, Shillong',
+      phone: '+91-3-3444-1181'
+    }
   };
 
   const getRiskColor = (level) => {
@@ -109,28 +132,6 @@ export function TouristDashboard({ onLogout }) {
               3 Active
             </Badge>
           </div>
-          
-          {/* <div className="space-y-3">
-            {riskAlerts.map((alert, index) => (
-              <Alert key={index} className={`border ${getRiskColor(alert.level)}`}>
-                <div className="flex items-start gap-3">
-                  {getRiskIcon(alert.type)}
-                  <div className="flex-1 ">
-                    <AlertDescription className="text-sm">
-                      <div className="font-medium mb-1">{alert.area}</div>
-                      {alert.message}
-                    </AlertDescription>
-                  </div>
-                  <Badge variant="outline" className={`text-xs ${getRiskColor(alert.level)}`}>
-                    {alert.level}
-                  </Badge>
-                </div>
-              </Alert>
-            ))}
-
-          </div> */}
-
-
 
              <div className="space-y-3">
             {riskAlerts.map((alert, index) => (
@@ -186,6 +187,10 @@ export function TouristDashboard({ onLogout }) {
                 <Eye className="h-3 w-3" />
                 Visibility: {weatherData.visibility}
               </div>
+                <div className="flex items-center gap-1 text-sm text-gray-500">
+                <Eye className="h-3 w-3" />
+                AQI: {weatherData.AQI}
+              </div>
             </div>
           </Card>
         </div>
@@ -223,7 +228,7 @@ export function TouristDashboard({ onLogout }) {
           </div>
         </Card>
 
-        {/* Safety Tips */}
+        {/* Safety Tips
         <Card className="p-4">
           <h3 className="font-medium mb-3 flex items-center gap-2">
             <Shield className="h-5 w-5 text-emerald-600" />
@@ -243,11 +248,76 @@ export function TouristDashboard({ onLogout }) {
               <p className="text-sm text-yellow-800">Emergency contact: 110 (Police), 119 (Fire/Medical)</p>
             </div>
           </div>
+        </Card> */}
+
+
+
+          {/* Emergency Services */}
+        <Card className="p-4">
+      
+
+
+          <div className="space-y-4">
+            {/* Police Station */}
+            <h2 className="font-semibold flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-emerald-600" />
+              Nearest Police Station
+            </h2>
+            <div className="flex items-center justify-between p-6 rounded-lg border border-black">
+              <div className="flex items-center gap-3">
+                {/* <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  
+                </div> */}
+                <div className="flex-1">
+                  <p className="font-medium mb-2 text-blue-900">{emergencyServices.police.name}</p>
+                  <p className="text-sm text-gray-700">{emergencyServices.police.address}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <MapPin className="h-3 w-3 text-blue-600" />
+                    <span className="text-xs text-blue-600 font-medium">{emergencyServices.police.distance} away</span>
+                  </div>
+                </div>
+              </div>
+              <Button size="lg" className="bg-emerald-600 text-white hover:bg-emerald-700">
+                <Phone className="h-4 w-4" />
+              </Button>
+            </div>
+
+           
+          </div>
+          <div className="space-y-4">
+             <h2 className="font-semibold flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-emerald-600" />
+              Nearest Hospital
+            </h2>
+             {/* Hospital */}
+            <div className="flex items-center justify-between p-6  rounded-lg border border-red-100">
+              <div className="flex items-center gap-3">
+                {/* <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <Heart className="h-5 w-5 text-red-600" />
+                </div> */}
+                <div className="flex-1">
+                  <p className="font-medium mb-2 text-red-900">{emergencyServices.hospital.name}</p>
+                  <p className="text-sm text-gray-700">{emergencyServices.hospital.address}</p>
+                  <div className="flex items-center gap-1 mt-1">
+                    <MapPin className="h-3 w-3 text-red-600" />
+                    <span className="text-xs text-red-600 font-medium">{emergencyServices.hospital.distance} away</span>
+                  </div>
+                </div>
+              </div>
+              <Button size="lg" className="bg-emerald-600 text-white hover:bg-emerald-700">
+                <Phone className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </Card>
 
+       
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">
-          <Button className="h-12 bg-emerald-600 hover:bg-emerald-700">
+          {/* <Button className="h-12 bg-red-600 text-black hover:bg-red-700">
+            Emergency Call
+          </Button> */}
+                    <Button variant="destructive" className="h-12 ">
             Emergency Call
           </Button>
           <Button variant="outline" className="h-12">

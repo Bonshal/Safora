@@ -5,13 +5,12 @@ import { TouristLogin } from './components/TouristLogin.jsx';
 import { AdminLogin } from './components/AdminLogin.jsx';
 import { TouristDashboard } from './components/TouristDashboard.jsx';
 import { AdminDashboard } from './components/AdminDashboard.jsx';
+import { TouristRegistration } from './components/TouristRegistration.jsx';
+
 
 export default function App() {
-  const [user, setUser] = useState({
-    type: 'tourist',
-    email: 'test@gmail.com'
-  });
-  const [appState, setAppState] = useState('logged-in');
+  const [user, setUser] = useState({});
+  const [appState, setAppState] = useState('landing');
 
   //hard code start
  
@@ -28,6 +27,21 @@ export default function App() {
     } else {
       setAppState('admin-login');
     }
+  };
+
+  const handleRegister = () => {
+    setAppState('tourist-registration');
+  };
+
+  const handleRegistrationComplete = (formData, touristId) => {
+    // Mock storing the registered user
+    setUser({
+      type: 'tourist',
+      email: formData.email,
+      touristId: touristId,
+      name: `${formData.firstName} ${formData.lastName}`
+    });
+    setAppState('logged-in');
   };
 
   const handleLogin = (userType, credentials) => {
@@ -70,7 +84,12 @@ export default function App() {
 
   // Show tourist login
   if (appState === 'tourist-login') {
-    return <TouristLogin onLogin={handleTouristLogin} onBack={handleBack} />;
+    return <TouristLogin onLogin={handleTouristLogin} onBack={handleBack} onRegister={handleRegister} />;
+  }
+
+  // Show tourist registration
+  if (appState === 'tourist-registration') {
+    return <TouristRegistration onBack={handleBack} onComplete={handleRegistrationComplete} />;
   }
 
   // Show admin login

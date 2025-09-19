@@ -4,7 +4,7 @@ import { Input } from './ui/input';
 import { Card } from './ui/card';
 import { ArrowLeft, Users, Shield } from 'lucide-react';
 
-export function TouristLogin({ onLogin, onBack }) {
+export function TouristLogin({ onLogin, onBack, onRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -43,7 +43,7 @@ export function TouristLogin({ onLogin, onBack }) {
             Sign in to your Account
           </h1>
           <p className="text-gray-600">
-            Enter your email and password to log in to your account
+            Enter your Tourist ID and password to log in to your account
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export function TouristLogin({ onLogin, onBack }) {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                EMAIL ADDRESS
+                TOURIST ID
               </label>
               <Input
                 id="email"
@@ -95,8 +95,8 @@ export function TouristLogin({ onLogin, onBack }) {
           </form>
         </Card>
 
-        {/* Social Login Options */}
-        <div className="space-y-3 mb-8">
+        
+        {/* <div className="space-y-3 mb-8">
           <div className="flex items-center gap-4">
             <div className="flex-1 h-px bg-gray-200"></div>
             <span className="text-sm text-gray-500">Or continue with</span>
@@ -113,12 +113,17 @@ export function TouristLogin({ onLogin, onBack }) {
               Apple
             </Button>
           </div>
-        </div>
+        </div> */}
 
         {/* Sign Up Link */}
         <div className="text-center">
           <p className="text-sm text-gray-500">
-            Don't have an account? <span className="text-gray-900 font-medium cursor-pointer hover:underline">Sign up</span>
+            Don't have an account? <span 
+              className="text-teal-600 font-medium cursor-pointer hover:underline"
+              onClick={onRegister}
+            >
+              Register for Tourist ID
+            </span>
           </p>
         </div>
       </div>

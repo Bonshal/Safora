@@ -40,7 +40,7 @@ export function AdminDashboard({ onLogout }) {
   };
 
   const recentAlerts = [
-    { id: 1, type: 'weather', level: 'high', area: 'Shibuya District', message: 'Heavy rainfall warning', status: 'active', created: '2 hours ago' },
+    { id: 1, type: 'weather', level: 'high', area: 'Mawsynram', message: 'Heavy rainfall warning', status: 'active', created: '2 hours ago' },
     { id: 2, type: 'crime', level: 'medium', area: 'Tourist areas', message: 'Pickpocket activity increase', status: 'active', created: '5 hours ago' },
     { id: 3, type: 'natural', level: 'low', area: 'All areas', message: 'Seismic activity monitoring', status: 'resolved', created: '1 day ago' }
   ];
@@ -111,6 +111,13 @@ export function AdminDashboard({ onLogout }) {
         </Card>
       </div>
 
+      <Card className="p-4">
+        <div className='space-y-3'>
+          <img src="/cluster_map_gen.png" alt="" className="w-full h-full" />
+        </div>
+
+      </Card>
+
       {/* Recent Activity */}
       <Card className="p-4">
         <h3 className="font-semibold mb-4">Recent Alerts</h3>
@@ -120,10 +127,14 @@ export function AdminDashboard({ onLogout }) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <Badge className={getRiskColor(alert.level)}>{alert.level}</Badge>
-                  <span className="text-sm font-medium">{alert.area}</span>
+                  <span className="text-sm font-medium ">
+                    {alert.area}
+                  </span>
+                  <span className="text-sm font-medium text-gray-400 ml-4">{alert.created}</span>
+                    
                 </div>
                 <p className="text-sm text-gray-600">{alert.message}</p>
-                <p className="text-xs text-gray-400 mt-1">{alert.created}</p>
+                
               </div>
               <Badge variant={alert.status === 'active' ? 'default' : 'secondary'}>
                 {alert.status}
@@ -261,7 +272,7 @@ export function AdminDashboard({ onLogout }) {
               <Menu className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="font-semibold text-gray-900">SafeGuide Admin</h1>
+              <h1 className="font-semibold text-gray-900">Safora</h1>
               <p className="text-sm text-gray-500">Safety Management Dashboard</p>
             </div>
           </div>
