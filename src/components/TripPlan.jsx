@@ -66,8 +66,8 @@ const mockTripData = [
 ];
 
 function SafetyScore({ score, size = 'default' }) {
-  const radius = size === 'small' ? 20 : 28;
-  const strokeWidth = size === 'small' ? 3 : 4;
+  const radius = size === 'small' ? 20 : size === 'large' ? 40 : 28;
+  const strokeWidth = size === 'small' ? 3 : size === 'large' ? 5 : 4;
   const normalizedRadius = radius - strokeWidth * 2;
   const circumference = normalizedRadius * 2 * Math.PI;
   const strokeDasharray = `${(score / 100) * circumference} ${circumference}`;
@@ -78,8 +78,11 @@ function SafetyScore({ score, size = 'default' }) {
     return '#ef4444'; // red
   };
 
+  const containerSize = size === 'small' ? 'w-12 h-12' : size === 'large' ? 'w-20 h-20' : 'w-16 h-16';
+  const textSize = size === 'small' ? 'text-sm' : size === 'large' ? 'text-2xl' : 'text-lg';
+
   return (
-    <div className={`relative ${size === 'small' ? 'w-12 h-12' : 'w-16 h-16'}`}>
+    <div className={`relative ${containerSize}`}>
       <svg
         height={radius * 2}
         width={radius * 2}
@@ -108,9 +111,9 @@ function SafetyScore({ score, size = 'default' }) {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className={`${size === 'small' ? 'text-sm' : 'text-lg'} text-foreground font-semibold`}>{score}</div>
-          {size === 'default' && (
-            <div className="text-xs text-muted-foreground -mt-0.5">Safety</div>
+          <div className={`${textSize} text-foreground font-bold leading-none`}>{score}</div>
+          {size !== 'small' && (
+            <div className={`text-xs text-muted-foreground ${size === 'large' ? 'mt-1' : '-mt-0.5'}`}>Safety</div>
           )}
         </div>
       </div>
@@ -173,7 +176,7 @@ export function TripPlan() {
                         </Badge>
                       </div>
                     </div>
-                    <SafetyScore score={place.safetyScore} size="small" />
+                    {/* <SafetyScore score={place.safetyScore} size="small" /> */}
                   </div>
                 </CardContent>
               </Card>
@@ -184,8 +187,8 @@ export function TripPlan() {
         {/* Current Location */}
         {currentLocation && (
           <Card className="border-primary bg-gradient-to-br from-primary/5 to-primary/10 shadow-lg border-2">
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between mb-4">
+            <div className="p-6">
+              <div className="mb-4">
                 <div className="flex items-start gap-3">
                   <div className="relative">
                     
@@ -211,13 +214,16 @@ export function TripPlan() {
                     </div>
                   </div>
                 </div>
-                <SafetyScore score={currentLocation.safetyScore} />
+                {/* Safety Score below the progress bar */}
+                <div className="flex justify-center mt-6">
+                  <SafetyScore score={currentLocation.safetyScore} size="large" />
+                </div>
               </div>
               {/* <div className="flex items-center gap-2 text-sm text-primary">
                 <Clock className="w-4 h-4" />
                 <span>Currently exploring</span>
               </div> */}
-            </CardContent>
+            </div>
           </Card>
         )}
 
@@ -228,6 +234,16 @@ export function TripPlan() {
             <div className="space-y-3 pr-4">
               {upcomingDestinations.map((destination, index) => {
                 const isExpanded = expandedDestinationId === destination.id;
+                
+                // Get safety color based on score
+                const getSafetyColor = (score) => {
+                  if (score >= 85) return '#10b981'; // green
+                  if (score >= 70) return '#f59e0b'; // yellow
+                  return '#ef4444'; // red
+                };
+                
+                const safetyColor = getSafetyColor(destination.safetyScore);
+                
                 return (
                   <Card 
                     key={destination.id} 
@@ -236,18 +252,29 @@ export function TripPlan() {
                         ? 'bg-gradient-to-br from-primary/5 to-primary/10 border-primary/50 shadow-lg' 
                         : 'bg-card hover:bg-accent hover:shadow-lg hover:border-primary/20'
                     }`}
+                    style={!isExpanded ? { borderLeftColor: safetyColor, borderLeftWidth: '4px' } : {}}
                     onClick={() => handleDestinationClick(destination)}
                   >
-                    <CardContent className={`transition-all duration-300 ${isExpanded ? 'p-5' : 'p-4'}`}>
+                    <div className={`transition-all duration-300 ${isExpanded ? 'p-6' : 'p-4'}`}>
                       <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-3 flex-1">
                           <div className={`flex items-center justify-center w-6 h-6 rounded-full text-sm flex-shrink-0 mt-0.5 ${
                             isExpanded ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'
                           }`}>
                             {index + 1}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h4 className="text-foreground">{destination.name}</h4>
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-foreground">{destination.name}</h4>
+                              {!isExpanded && (
+                                <div 
+                                  className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold text-white flex-shrink-0"
+                                  style={{ backgroundColor: safetyColor }}
+                                >
+                                  {destination.safetyScore}
+                                </div>
+                              )}
+                            </div>
                             <p className="text-sm text-muted-foreground mt-1">{destination.description}</p>
                             <Badge 
                               variant={isExpanded ? "default" : "outline"} 
@@ -261,17 +288,20 @@ export function TripPlan() {
                             </Badge>
                           </div>
                         </div>
-                        {isExpanded && (
-                          <SafetyScore score={destination.safetyScore} />
-                        )}
                       </div>
                       {isExpanded && (
-                        <div className="flex items-center gap-2 text-sm text-primary mt-4">
-                          <Clock className="w-4 h-4" />
-                          <span>Planned destination</span>
-                        </div>
+                        <>
+                          {/* Safety Score below the content */}
+                          <div className="flex justify-center mt-4">
+                            <SafetyScore score={destination.safetyScore} size="large" />
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-primary mt-4">
+                            <Clock className="w-4 h-4" />
+                            <span>Planned destination</span>
+                          </div>
+                        </>
                       )}
-                    </CardContent>
+                    </div>
                   </Card>
                 );
               })}
