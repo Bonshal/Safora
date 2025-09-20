@@ -5,6 +5,9 @@
 
   export default defineConfig({
     plugins: [react()],
+    css: {
+      postcss: './postcss.config.js',
+    },
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {

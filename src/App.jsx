@@ -6,11 +6,11 @@ import { AdminLogin } from './components/AdminLogin.jsx';
 import { TouristDashboard } from './components/TouristDashboard.jsx';
 import { AdminDashboard } from './components/AdminDashboard.jsx';
 import { TouristRegistration } from './components/TouristRegistration.jsx';
-
+import { TripPlan } from './components/TripPlan.jsx';
 
 export default function App() {
   const [user, setUser] = useState({});
-  const [appState, setAppState] = useState('landing');
+  const [appState, setAppState] = useState('trip-plan');
 
   //hard code start
  
@@ -56,6 +56,8 @@ export default function App() {
   const handleTouristLogin = (credentials) => {
     handleLogin('tourist', credentials);
   };
+
+  
 
   const handleAdminLogin = (credentials) => {
     handleLogin('admin', credentials);
@@ -103,6 +105,11 @@ export default function App() {
       return <AdminDashboard onLogout={handleLogout} />;
     }
     return <TouristDashboard onLogout={handleLogout} />;
+  }
+
+  //trip plan
+  if(appState == 'trip-plan'){
+    return <TripPlan/>
   }
 
   // Fallback to landing page

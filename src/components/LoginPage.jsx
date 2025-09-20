@@ -5,16 +5,12 @@ import { Card } from './ui/card';
 import { MapPin, Shield, Globe, Users } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
-interface LoginPageProps {
-  onLogin: (userType: 'tourist' | 'admin', credentials: { email: string; password: string }) => void;
-}
-
-export function LoginPage({ onLogin }: LoginPageProps) {
-  const [userType, setUserType] = useState<'tourist' | 'admin'>('tourist');
+export function LoginPage({ onLogin }) {
+  const [userType, setUserType] = useState('tourist');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     onLogin(userType, { email, password });
   };
