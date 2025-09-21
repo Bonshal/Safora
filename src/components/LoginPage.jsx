@@ -21,13 +21,18 @@ export function LoginPage({ onLogin }) {
       <div className="relative h-48 bg-emerald-600 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/90 to-emerald-500/90"></div>
         <ImageWithFallback 
-          src="https://images.unsplash.com/photo-1720539468812-b8c048d0bcf1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwc2t5bGluZSUyMHVyYmFuJTIwdHJhdmVsfGVufDF8fHx8MTc1ODA5NjYyM3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+          src="/"
           alt="Travel landscape"
           className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-white bg-[rgba(66,152,141,0)]">
           <div className="flex items-center gap-2 mb-4">
-            <Shield className="h-8 w-8" />
+            <img 
+              src="/Custom_logo.png" 
+              alt="Safora Logo" 
+              className="h-8 w-8"
+              style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(45%) saturate(509%) hue-rotate(113deg) brightness(91%) contrast(87%)' }}
+            />
             <h1 className="text-3xl font-bold">Safora</h1>
           </div>
           <p className="text-emerald-100 text-center px-4">Your intelligent travel safety companion</p>
@@ -57,7 +62,16 @@ export function LoginPage({ onLogin }) {
             onClick={() => setUserType('admin')}
           >
             <div className="flex flex-col items-center text-center">
-              <Shield className={`h-8 w-8 mb-2 ${userType === 'admin' ? 'text-emerald-600' : 'text-gray-400'}`} />
+              <img 
+                src="/Custom_logo.png" 
+                alt="Admin" 
+                className={`h-8 w-8 mb-2 ${userType === 'admin' ? '' : ''}`}
+                style={{ 
+                  filter: userType === 'admin' 
+                    ? 'brightness(0) saturate(100%) invert(71%) sepia(45%) saturate(509%) hue-rotate(113deg) brightness(91%) contrast(87%)'
+                    : 'brightness(0) saturate(100%) invert(61%) sepia(13%) saturate(295%) hue-rotate(152deg) brightness(95%) contrast(89%)'
+                }}
+              />
               <h3 className={`font-medium ${userType === 'admin' ? 'text-emerald-900' : 'text-gray-700'}`}>Admin</h3>
               <p className="text-sm text-gray-500 mt-1">Manage safety</p>
             </div>

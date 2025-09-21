@@ -9,59 +9,59 @@ import { ChevronDown, ChevronUp, MapPin, Clock, CheckCircle2, Shield } from 'luc
 const mockTripData = [
   {
     id: '1',
-    name: 'Paris, France',
-    description: 'Explored the Eiffel Tower and Louvre Museum',
+    name: 'Jaipur, Rajasthan',
+    description: 'Explored the Ajmer Fort and city palace',
     estimatedTime: '3 days',
     type: 'visited',
     safetyScore: 85
   },
   {
     id: '2',
-    name: 'Rome, Italy',
-    description: 'Visited the Colosseum and Vatican City',
+    name: 'Jaipur, Rajasthan',
+    description: 'Visited the Hawah Mahal ',
     estimatedTime: '2 days',
     type: 'visited',
     safetyScore: 78
   },
   {
     id: '3',
-    name: 'Barcelona, Spain',
-    description: 'Currently exploring Sagrada Familia and Park Güell',
+    name: 'Jaipur, Rajasthan',      
+    description: 'Currently exploring Jantar Mantar, Nahagrah Fort',
     estimatedTime: '4 days',
     type: 'current',
     safetyScore: 82
   },
   {
     id: '4',
-    name: 'Amsterdam, Netherlands',
-    description: 'Canal tours and Van Gogh Museum',
-    estimatedTime: '2 days',
+    name: 'Jodhpur, Rajasthan',
+    description: 'Mehrangarh Fort',
+    estimatedTime: '1 days',
     type: 'upcoming',
     safetyScore: 91
   },
   {
     id: '5',
-    name: 'Berlin, Germany',
+    name: 'Jodhpur, Rajasthan',
     description: 'Historical sites and modern culture',
-    estimatedTime: '3 days',
+    estimatedTime: '2 days',
     type: 'upcoming',
     safetyScore: 88
   },
   {
     id: '6',
-    name: 'Prague, Czech Republic',
-    description: 'Old Town Square and Prague Castle',
-    estimatedTime: '2 days',
+    name: 'Agra, Czech Delhi',
+    description: 'Taj Mahal',
+    estimatedTime: '1 days',
     type: 'upcoming',
-    safetyScore: 86
+    safetyScore: 60
   },
   {
     id: '7',
-    name: 'Vienna, Austria',
-    description: 'Imperial palaces and classical music',
+    name: 'Pahalgam, J&K',
+    description: 'hill station',
     estimatedTime: '2 days',
     type: 'upcoming',
-    safetyScore: 93
+    safetyScore: 55
   }
 ];
 
@@ -138,8 +138,7 @@ export function TripPlan() {
     <div className="max-w-md mx-auto bg-background min-h-screen">
       {/* Header */}
       <div className="p-6 border-b border-border bg-card">
-        <h1 className="text-center mb-2">European Adventure</h1>
-        <p className="text-center text-muted-foreground">Your Journey Through Europe</p>
+        <p className="text-center text-muted-foreground">Your Trip plan</p>
       </div>
 
       <div className="p-4 space-y-4">

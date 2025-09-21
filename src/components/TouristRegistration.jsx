@@ -22,7 +22,13 @@ import {
   Camera
 } from 'lucide-react';
 
+
+
+
 export function TouristRegistration({ onBack, onComplete }) {
+
+
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Basic Details

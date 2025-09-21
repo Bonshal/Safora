@@ -4,13 +4,15 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Alert, AlertDescription } from './ui/alert';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible';
+import { ScrollArea } from './ui/scroll-area';
+import { ChevronDown, ChevronUp, MapPin, Clock, CheckCircle2, Shield } from 'lucide-react';
+import { TripPlan } from './TripPlan';
 
 import { 
-  MapPin, 
   AlertTriangle, 
   Cloud, 
   Wind, 
-  Shield, 
   Navigation, 
   Search,
   Menu,
@@ -20,12 +22,24 @@ import {
   Droplets,
   Eye,
   Phone,
-  Heart
+  Heart,
+  BarChart3,
+  Settings
 } from 'lucide-react';
 
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export function TouristDashboard({ onLogout }) {
+
+
+    const [activeTab, setActiveTab] = useState('overview');
+    const [newAlert, setNewAlert] = useState({
+      type: '',
+      level: '',
+      area: '',
+      message: ''
+    });
+
   const [searchLocation, setSearchLocation] = useState('');
   const [currentLocation] = useState('Mawsynram, Meghalaya');
   
@@ -81,35 +95,9 @@ export function TouristDashboard({ onLogout }) {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="font-semibold text-gray-900">Safora</h1>
-              <p className="text-sm text-gray-500 flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {currentLocation}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onLogout}>
-              <User className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-4 space-y-6">
+  const renderOverview = () => {
+    return (
+    <div className="p-4 space-y-6">
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -228,27 +216,6 @@ export function TouristDashboard({ onLogout }) {
           </div>
         </Card>
 
-        {/* Safety Tips
-        <Card className="p-4">
-          <h3 className="font-medium mb-3 flex items-center gap-2">
-            <Shield className="h-5 w-5 text-emerald-600" />
-            000000
-          </h3>
-          <div className="space-y-2">
-            <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg">
-              <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2 flex-shrink-0"></div>
-              <p className="text-sm text-emerald-800">Carry an umbrella due to expected rainfall</p>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-              <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-              <p className="text-sm text-blue-800">Keep valuables secure in crowded areas</p>
-            </div>
-            <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg">
-              <div className="w-2 h-2 bg-yellow-600 rounded-full mt-2 flex-shrink-0"></div>
-              <p className="text-sm text-yellow-800">Emergency contact: 110 (Police), 119 (Fire/Medical)</p>
-            </div>
-          </div>
-        </Card> */}
 
 
 
@@ -325,6 +292,73 @@ export function TouristDashboard({ onLogout }) {
           </Button>
         </div>
       </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm">
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="font-semibold text-gray-900">Safora</h1>
+              <p className="text-sm text-gray-500 flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                {currentLocation}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm">
+              <Bell className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onLogout}>
+              <User className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+           {/* Navigation Tabs */}
+      <div className="bg-white border-b">
+        <div className="flex overflow-x-auto">
+          {[
+            { id: 'overview', label: 'Overview', icon: BarChart3 },
+            { id: 'tripPlan', label: 'Trip plan', icon: AlertTriangle },
+            { id: 'settings', label: 'Settings', icon: Settings }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'border-emerald-600 text-emerald-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-4">
+              {activeTab === 'overview' && renderOverview()}
+              {activeTab === 'tripPlan' && <TripPlan />}
+              {activeTab === 'settings' && (
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-4">Settings</h3>
+                  <p className="text-gray-600">Settings panel coming soon...</p>
+                </Card>
+              )}
+            </div>
+
+      
     </div>
   );
 }

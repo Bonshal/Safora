@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from './ui/button.tsx';
 import { Card } from './ui/card.tsx';
-import { Shield, MapPin, AlertTriangle, Globe, Clock, Users, ArrowRight } from 'lucide-react';
+import { Shield, ShieldCheck, ShieldAlert, MapPin, AlertTriangle, Globe, Clock, Users, ArrowRight } from 'lucide-react';
 
 export function LandingPage({ onGetStarted }) {
   return (
@@ -11,9 +11,16 @@ export function LandingPage({ onGetStarted }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
+            <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center relative">
+              <Shield className="h-7 w-7 text-white" />
+              <MapPin className="h-3.5 w-3.5 text-white absolute" />
             </div>
+            {/* <img 
+              src="/Custom_logo.png" 
+              alt="Safora Logo" 
+              className="h-16 w-17"
+              style={{ filter: 'brightness(0) saturate(100%) invert(71%) sepia(45%) saturate(509%) hue-rotate(113deg) brightness(60%) contrast(87%)' }}
+            /> */}
             <span className="text-xl font-semibold text-gray-900">Safora</span>
           </div>
         </div>

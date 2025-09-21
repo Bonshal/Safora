@@ -9,8 +9,8 @@ import { TouristRegistration } from './components/TouristRegistration.jsx';
 import { TripPlan } from './components/TripPlan.jsx';
 
 export default function App() {
-  const [user, setUser] = useState({});
-  const [appState, setAppState] = useState('trip-plan');
+  const [user, setUser] = useState(null);
+  const [appState, setAppState] = useState('landing');
 
   //hard code start
  
@@ -54,6 +54,7 @@ export default function App() {
   };
 
   const handleTouristLogin = (credentials) => {
+    console.log('Tourist login called with:', credentials);
     handleLogin('tourist', credentials);
   };
 
@@ -101,6 +102,7 @@ export default function App() {
 
   // Show dashboard based on user type
   if (appState === 'logged-in' && user) {
+    console.log('Rendering dashboard for user:', user);
     if (user.type === 'admin') {
       return <AdminDashboard onLogout={handleLogout} />;
     }
