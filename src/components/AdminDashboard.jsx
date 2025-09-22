@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Alert, AlertDescription } from './ui/alert';
+import { TouristRegistration } from './TouristRegistration';
 import { 
   Shield, 
   AlertTriangle, 
@@ -24,6 +25,7 @@ import {
 
 export function AdminDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [showRegistration, setShowRegistration] = useState(false);
   const [newAlert, setNewAlert] = useState({
     type: '',
     level: '',
@@ -64,6 +66,18 @@ export function AdminDashboard({ onLogout }) {
     // Mock alert creation
     console.log('Creating alert:', newAlert);
     setNewAlert({ type: '', level: '', area: '', message: '' });
+  };
+
+  const handleRegistrationComplete = (formData, touristId) => {
+    // Handle successful registration
+    console.log('New tourist registered by admin:', { formData, touristId });
+    setShowRegistration(false);
+    // You could add the new tourist to the activeUsers list here
+    alert(`Tourist successfully registered with ID: ${touristId}`);
+  };
+
+  const handleRegistrationBack = () => {
+    setShowRegistration(false);
   };
 
   const renderOverview = () => (
@@ -231,7 +245,16 @@ export function AdminDashboard({ onLogout }) {
 
   const renderUsers = () => (
     <Card className="p-4">
-      <h3 className="font-semibold mb-4">Active Users</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold">Active Users</h3>
+        <Button 
+          onClick={() => setShowRegistration(true)}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Register New Tourist
+        </Button>
+      </div>
       <div className="space-y-3">
         {activeUsers.map((user) => (
           <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg">
@@ -264,8 +287,15 @@ export function AdminDashboard({ onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      {showRegistration ? (
+        <TouristRegistration 
+          onBack={handleRegistrationBack} 
+          onComplete={handleRegistrationComplete} 
+        />
+      ) : (
+        <>
+          {/* Header */}
+          <div className="bg-white shadow-sm border-b">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm">
@@ -323,6 +353,8 @@ export function AdminDashboard({ onLogout }) {
           </Card>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }
