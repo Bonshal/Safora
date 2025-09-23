@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import GoogleMapComponent from './GoogleMapComponent';
 
 export function TouristDashboard({ onLogout }) {
 
@@ -196,12 +197,31 @@ export function TouristDashboard({ onLogout }) {
           </div>
           
           <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden">
-            <ImageWithFallback 
-              src="/fake-map.png"
-              alt="Map view"
-              className="w-full h-full object-cover"
+            <GoogleMapComponent
+              apiKey="YOUR_GOOGLE_MAPS_API_KEY" // Replace with your actual API key
+              center={{ lat: 25.2677, lng: 91.8833 }} // Mawsynram
+              zoom={14}
+              sensitiveZones={[
+                {
+                  id: 1,
+                  name: 'High Crime Area',
+                  center: { lat: 25.2677, lng: 91.8833 },
+                  radius: 300,
+                  level: 'high'
+                }
+              ]}
+              userLocations={[
+                {
+                  id: 1,
+                  name: 'Your Location',
+                  lat: 25.2677,
+                  lng: 91.8833,
+                  status: 'Current Location'
+                }
+              ]}
+              className="w-full h-full"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
             <div className="absolute bottom-4 left-4 right-4">
               <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3">
                 <div className="flex items-center gap-2">

@@ -6,6 +6,7 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Alert, AlertDescription } from './ui/alert';
+import { touristService } from '../lib/supabase';
 import { 
   Shield, 
   ArrowLeft, 
@@ -19,7 +20,11 @@ import {
   CheckCircle,
   Clock,
   Globe,
-  Camera
+  Camera,
+  Plus,
+  Trash2,
+  Loader,
+  AlertTriangle
 } from 'lucide-react';
 
 
@@ -53,12 +58,10 @@ export function TouristRegistration({ onBack, onComplete }) {
     selfieFile: null,
     
     // Trip Itinerary
-    destinations: '',
+    destinations: [''], // Array of destinations, starting with one empty field
     tripDuration: '',
     startDate: '',
     endDate: '',
-    accommodationType: '',
-    tripPurpose: '',
     specialRequirements: ''
   });
 
@@ -67,11 +70,24 @@ export function TouristRegistration({ onBack, onComplete }) {
     selfie: false
   });
 
+  const [submissionState, setSubmissionState] = useState({
+    isLoading: false,
+    error: null,
+    success: false
+  });
+
+  const [verificationState, setVerificationState] = useState({
+    isVerifying: false,
+    isVerified: false,
+    error: null
+  });
+
   const steps = [
     { id: 1, title: 'Basic Details', icon: User },
     { id: 2, title: 'Emergency Contacts', icon: Phone },
-    { id: 3, title: 'KYC Verification', icon: FileText },
-    { id: 4, title: 'Trip Itinerary', icon: MapPin }
+     { id: 3, title: 'Trip Itinerary', icon: MapPin },
+    { id: 4, title: 'KYC Verification', icon: FileText },
+   
   ];
 
   const handleInputChange = (field, value) => {
@@ -79,6 +95,19 @@ export function TouristRegistration({ onBack, onComplete }) {
       ...prev,
       [field]: value
     }));
+  };
+
+  // Convert trip duration text to days with buffer
+  const convertTripDurationToDays = (durationText) => {
+    const durationMap = {
+      "1-3 days": 3 + 15, // 18 days
+      "4-7 days": 7 + 15, // 22 days  
+      "1-2 weeks": 14 + 15, // 29 days
+      "3-4 weeks": 28 + 15, // 43 days
+      "1+ month": 30 + 15  // 45 days
+    };
+    
+    return durationMap[durationText] || 0;
   };
 
   const handleFileUpload = (type, file) => {
@@ -92,13 +121,146 @@ export function TouristRegistration({ onBack, onComplete }) {
     }));
   };
 
-  const handleNext = () => {
+  // Destination management functions
+  const addDestination = () => {
+    setFormData(prev => ({
+      ...prev,
+      destinations: [...prev.destinations, '']
+    }));
+  };
+
+  const removeDestination = (index) => {
+    if (formData.destinations.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        destinations: prev.destinations.filter((_, i) => i !== index)
+      }));
+    }
+  };
+
+  const updateDestination = (index, value) => {
+    setFormData(prev => ({
+      ...prev,
+      destinations: prev.destinations.map((dest, i) => i === index ? value : dest)
+    }));
+  };
+
+  const handleNext = async () => {
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Generate blockchain-based Tourist ID (mock for now)
-      const touristId = `BTID-${Date.now().toString(36).toUpperCase()}`;
-      onComplete && onComplete(formData, touristId);
+      // Step 4 (KYC) - Show verification process instead of direct submission
+      if (!verificationState.isVerified) {
+        // Start verification process
+        await handleVerification();
+      } else {
+        // Verification complete, proceed with final submission
+        await handleFinalSubmission();
+      }
+    }
+  };
+
+  const handleVerification = async () => {
+    setVerificationState({ isVerifying: true, isVerified: false, error: null });
+    
+    try {
+      // Simulate document verification process (3-5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 4000));
+      
+      // Simulate verification success (you can add validation logic here)
+      const hasDocuments = uploadStatus.document && uploadStatus.selfie;
+      const hasDocumentNumber = formData.documentNumber?.trim();
+      const hasDocumentType = formData.documentType;
+      
+      if (!hasDocuments || !hasDocumentNumber || !hasDocumentType) {
+        throw new Error('Please ensure all required documents are uploaded and document details are filled');
+      }
+      
+      // Verification successful
+      setVerificationState({ 
+        isVerifying: false, 
+        isVerified: true, 
+        error: null 
+      });
+      
+    } catch (error) {
+      setVerificationState({ 
+        isVerifying: false, 
+        isVerified: false, 
+        error: error.message 
+      });
+    }
+  };
+
+  const handleFinalSubmission = async () => {
+    // Final submission - save to Supabase
+    setSubmissionState({ isLoading: true, error: null, success: false });
+    
+    try {
+      // Generate a temporary ID for file uploads
+      const tempTouristId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Upload documents and selfie to Supabase Storage
+      let documentUrls = {};
+      if (formData.documentFile || formData.selfieFile) {
+        const uploadResult = await touristService.uploadTouristDocuments({
+          documentFile: formData.documentFile,
+          selfieFile: formData.selfieFile
+        }, tempTouristId);
+
+        if (uploadResult.error) {
+          throw new Error(`File upload failed: ${uploadResult.error.message}`);
+        }
+
+        documentUrls = uploadResult.data;
+      }
+
+      // Prepare data for Supabase (matching our new database schema)
+      const touristData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        nationality: formData.nationality,
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        emergencyContactName: formData.emergencyName,
+        emergencyContactPhone: formData.emergencyPhone,
+        emergencyContactRelationship: formData.emergencyRelation,
+        emergencyContactEmail: formData.emergencyEmail,
+        documentType: formData.documentType,
+        documentNumber: formData.documentNumber,
+        documentUrl: documentUrls.documentUrl || null,
+        selfieUrl: documentUrls.selfieUrl || null,
+        destinations: formData.destinations.filter(dest => dest.trim() !== ''),
+        tripDuration: convertTripDurationToDays(formData.tripDuration),
+        specialRequirements: formData.specialRequirements || ''
+      };
+
+      // Save to Supabase
+      const { data, error } = await touristService.createTourist(touristData);
+
+      if (error) {
+        throw new Error(error.message || 'Failed to save registration');
+      }
+
+      // Success! Get the generated ID from Supabase
+      const touristId = data?.id || `BTID-${Date.now().toString(36).toUpperCase()}`;
+      
+      setSubmissionState({ isLoading: false, error: null, success: true });
+      
+      // Call the completion callback with the real database ID
+      if (onComplete) {
+        onComplete(formData, touristId);
+      }
+
+    } catch (error) {
+      console.error('Registration error:', error);
+      setSubmissionState({ 
+        isLoading: false, 
+        error: error.message || 'Failed to complete registration. Please try again.', 
+        success: false 
+      });
     }
   };
 
@@ -117,9 +279,11 @@ export function TouristRegistration({ onBack, onComplete }) {
       case 2:
         return formData.emergencyName && formData.emergencyPhone && formData.emergencyRelation;
       case 3:
-        return formData.documentType && formData.documentNumber && uploadStatus.document && uploadStatus.selfie;
+        // Trip Itinerary - check if at least one destination is filled and duration is set
+        return formData.destinations.some(dest => dest.trim() !== '') && formData.tripDuration;
       case 4:
-        return formData.destinations && formData.startDate && formData.endDate && formData.tripPurpose;
+        // KYC Verification - check documents are uploaded
+        return formData.documentType && formData.documentNumber && uploadStatus.document && uploadStatus.selfie;
       default:
         return false;
     }
@@ -327,8 +491,99 @@ export function TouristRegistration({ onBack, onComplete }) {
           </Card>
         )}
 
-        {/* Step 3: KYC Verification */}
+        {/* Step 3: Trip Itinerary */}
         {currentStep === 3 && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-emerald-600" />
+              Trip Itinerary
+            </h2>
+            
+            <div className="space-y-4">
+              {/* Dynamic Destinations */}
+              <div>
+                <label className="block text-sm font-medium mb-3">Destinations to Visit *</label>
+                
+                <div className="space-y-3">
+                  {formData.destinations.map((destination, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <Input
+                          value={destination}
+                          onChange={(e) => updateDestination(index, e.target.value)}
+                          placeholder={index === 0 ? "Enter your first destination (e.g., Shillong)" : `Enter destination ${index + 1}`}
+                        />
+                      </div>
+                      {formData.destinations.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeDestination(index)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {/* Add Destination Button - positioned below and on the left */}
+                  <div className="flex justify-start">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addDestination}
+                      className="flex items-center gap-1 text-emerald-600 border-emerald-600 hover:bg-emerald-50"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Destination
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Trip Duration</label>
+                <Select value={formData.tripDuration} onValueChange={(value) => handleInputChange('tripDuration', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-3 days">1-3 days</SelectItem>
+                    <SelectItem value="4-7 days">4-7 days</SelectItem>
+                    <SelectItem value="1-2 weeks">1-2 weeks</SelectItem>
+                    <SelectItem value="3-4 weeks">3-4 weeks</SelectItem>
+                    <SelectItem value="1+ month">1+ month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Special Requirements</label>
+                <Textarea
+                  value={formData.specialRequirements}
+                  onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
+                  placeholder="Any special requirements, medical conditions, or accessibility needs"
+                  rows={3}
+                />
+              </div>
+
+              <Alert>
+                <Globe className="h-4 w-4" />
+                <AlertDescription>
+                  Your itinerary will help us provide personalized safety alerts and recommendations during your trip.
+                </AlertDescription>
+              </Alert>
+            </div>
+          </Card>
+        )}
+
+
+        
+        {/* Step 4: KYC Verification */}
+        {currentStep === 4 && (
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
               <FileText className="h-5 w-5 text-emerald-600" />
@@ -354,9 +609,10 @@ export function TouristRegistration({ onBack, onComplete }) {
               <div>
                 <label className="block text-sm font-medium mb-2">Document Number *</label>
                 <Input
+                  type="text"
                   value={formData.documentNumber}
                   onChange={(e) => handleInputChange('documentNumber', e.target.value)}
-                  placeholder="Enter document number"
+                  placeholder="Enter document number "
                 />
               </div>
 
@@ -414,119 +670,141 @@ export function TouristRegistration({ onBack, onComplete }) {
                   Your documents will be verified using blockchain technology to ensure security and authenticity. All data is encrypted and stored securely.
                 </AlertDescription>
               </Alert>
+
+              {/* Verification Process */}
+              {verificationState.isVerifying && (
+                <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-center space-y-4 flex-col">
+                    <Loader className="h-8 w-8 text-blue-600 animate-spin" />
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-blue-800 mb-2">Verifying Documents...</h3>
+                      <p className="text-blue-600 text-sm">
+                        Please wait while we verify your documents using our secure blockchain verification system.
+                      </p>
+                      <p className="text-blue-500 text-xs mt-1">This usually takes 30-60 seconds.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Verification Success */}
+              {verificationState.isVerified && (
+                <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-800">Verification Successful!</h3>
+                      <p className="text-green-600 text-sm">
+                        Your documents have been successfully verified. You can now submit your registration.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Verification Error */}
+              {verificationState.error && (
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    <div>
+                      <h3 className="text-sm font-semibold text-red-800">Verification Failed</h3>
+                      <p className="text-red-600 text-sm">{verificationState.error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Final Submission Loading */}
+              {submissionState.isLoading && (
+                <div className="mt-6 p-6 bg-emerald-50 border border-emerald-200 rounded-lg">
+                  <div className="flex items-center justify-center space-y-4 flex-col">
+                    <Loader className="h-8 w-8 text-emerald-600 animate-spin" />
+                    <div className="text-center">
+                      <h3 className="text-lg font-semibold text-emerald-800 mb-2">Submitting Registration...</h3>
+                      <p className="text-emerald-600 text-sm">
+                        Saving your registration to our secure database.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submission Success */}
+              {submissionState.success && (
+                <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                    <div>
+                      <h3 className="text-lg font-semibold text-green-800">Registration Complete!</h3>
+                      <p className="text-green-600 text-sm">
+                        Your tourist registration has been successfully submitted and saved to our database.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submission Error */}
+              {submissionState.error && (
+                <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    <div>
+                      <h3 className="text-sm font-semibold text-red-800">Submission Failed</h3>
+                      <p className="text-red-600 text-sm">{submissionState.error}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
         )}
 
-        {/* Step 4: Trip Itinerary */}
-        {currentStep === 4 && (
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-emerald-600" />
-              Trip Itinerary
-            </h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Destinations to Visit *</label>
-                <Textarea
-                  value={formData.destinations}
-                  onChange={(e) => handleInputChange('destinations', e.target.value)}
-                  placeholder="List the places you plan to visit (e.g., Tokyo, Kyoto, Osaka)"
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Start Date *</label>
-                  <Input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => handleInputChange('startDate', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">End Date *</label>
-                  <Input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => handleInputChange('endDate', e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Trip Purpose *</label>
-                  <Select value={formData.tripPurpose} onValueChange={(value) => handleInputChange('tripPurpose', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select purpose" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tourism">Tourism</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="education">Education</SelectItem>
-                      <SelectItem value="medical">Medical</SelectItem>
-                      <SelectItem value="family">Family Visit</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Accommodation Type</label>
-                  <Select value={formData.accommodationType} onValueChange={(value) => handleInputChange('accommodationType', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select accommodation" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hotel">Hotel</SelectItem>
-                      <SelectItem value="hostel">Hostel</SelectItem>
-                      <SelectItem value="airbnb">Airbnb</SelectItem>
-                      <SelectItem value="family">Family/Friends</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Special Requirements</label>
-                <Textarea
-                  value={formData.specialRequirements}
-                  onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
-                  placeholder="Any special requirements, medical conditions, or accessibility needs"
-                  rows={3}
-                />
-              </div>
-
-              <Alert>
-                <Globe className="h-4 w-4" />
-                <AlertDescription>
-                  Your itinerary will help us provide personalized safety alerts and recommendations during your trip.
-                </AlertDescription>
-              </Alert>
-            </div>
-          </Card>
-        )}
 
         {/* Navigation Buttons */}
         <div className="flex justify-between mt-6">
-          <Button variant="outline" onClick={handlePrevious}>
+          <Button 
+            variant="outline" 
+            onClick={handlePrevious} 
+            disabled={submissionState.isLoading || verificationState.isVerifying || submissionState.success}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             {currentStep === 1 ? 'Back' : 'Previous'}
           </Button>
           
           <Button 
             onClick={handleNext}
-            disabled={!isStepValid()}
+            disabled={!isStepValid() || submissionState.isLoading || verificationState.isVerifying || submissionState.success}
             className="bg-emerald-600 hover:bg-emerald-700"
           >
-            {currentStep === 4 ? (
+            {verificationState.isVerifying ? (
               <>
-                Generate Tourist ID
-                <Shield className="h-4 w-4 ml-2" />
+                <Loader className="h-4 w-4 mr-2 animate-spin" />
+                Verifying Documents...
               </>
+            ) : submissionState.isLoading ? (
+              <>
+                <Loader className="h-4 w-4 mr-2 animate-spin" />
+                Saving to Database...
+              </>
+            ) : submissionState.success ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Registration Complete
+              </>
+            ) : currentStep === 4 ? (
+              !verificationState.isVerified ? (
+                <>
+                  Verify Documents
+                  <Shield className="h-4 w-4 ml-2" />
+                </>
+              ) : (
+                <>
+                  Submit Registration
+                  <CheckCircle className="h-4 w-4 ml-2" />
+                </>
+              )
             ) : (
               <>
                 Next
@@ -535,6 +813,25 @@ export function TouristRegistration({ onBack, onComplete }) {
             )}
           </Button>
         </div>
+
+        {/* Error Display */}
+        {submissionState.error && (
+          <Alert className="mt-4 border-red-200 bg-red-50">
+            <AlertDescription className="text-red-800">
+              <strong>Registration Failed:</strong> {submissionState.error}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Success Display */}
+        {submissionState.success && (
+          <Alert className="mt-4 border-green-200 bg-green-50">
+            <CheckCircle className="h-4 w-4" />
+            <AlertDescription className="text-green-800">
+              <strong>Success!</strong> Tourist registration completed successfully and saved to database.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Blockchain Info */}
         <Card className="p-4 mt-6 bg-emerald-50 border-emerald-200">
