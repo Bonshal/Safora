@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps API Test</title>
+    <style>
+        #map { height: 400px; width: 100%; }
+        .error { background: #ffebee; padding: 20px; color: #c62828; }
+    </style>
+</head>
+<body>
+    <h1>Google Maps API Test</h1>
+    <div id="map"></div>
+    <div id="error" class="error" style="display: none;"></div>
+
+    <script>
+        function initMap() {
+            console.log('Initializing map...');
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 13,
+                center: { lat: 25.2677, lng: 91.8833 },
+            });
+            
+            // Add a marker
+            new google.maps.Marker({
+                position: { lat: 25.2677, lng: 91.8833 },
+                map: map,
+                title: "Test Location"
+            });
+            
+            console.log('Map initialized successfully!');
+        }
+
+        function handleError() {
+            console.error('Google Maps failed to load');
+            document.getElementById('map').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = 'Google Maps API failed to load. Check your API key and console for errors.';
+        }
+
+        window.gm_authFailure = handleError;
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.includes('google')) {
+                handleError();
+            }
+        });
+    </script>
+    <script async defer 
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6Ic2w3U2VZ5RbLUORNHCNzk-MUhtindU&callback=initMap&libraries=geometry"
+            onerror="handleError()">
+    </script>
+</body>
+</html>
