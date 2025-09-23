@@ -14,9 +14,9 @@ export function AdminLogin({ onLogin, onBack }) {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       {/* Header */}
-      <div className="flex items-center gap-4 p-6">
+      <div className="absolute top-0 left-0 right-0 flex items-center gap-4 p-6">
         <Button 
           variant="ghost" 
           size="sm"
@@ -33,7 +33,7 @@ export function AdminLogin({ onLogin, onBack }) {
         </div>
       </div>
 
-      <div className="px-6 py-8">
+      <div className="w-full max-w-md px-6">
         {/* Title */}
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
@@ -48,7 +48,7 @@ export function AdminLogin({ onLogin, onBack }) {
         </div>
 
         {/* Login Form */}
-        <Card className="p-6 mb-6 shadow-sm border-0 bg-gray-50">
+        <Card className="p-6 mb-6  shadow-lg border border-gray-200 bg-white rounded-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="admin-email" className="block text-sm font-medium text-gray-700 mb-2">

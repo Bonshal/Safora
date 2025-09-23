@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 
 export function AdminDashboard({ onLogout }) {
+  // Updated layout with max-width constraints for professional appearance
   const [activeTab, setActiveTab] = useState('overview');
   const [showRegistration, setShowRegistration] = useState(false);
   const [newAlert, setNewAlert] = useState({
@@ -366,7 +367,7 @@ export function AdminDashboard({ onLogout }) {
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -907,66 +908,70 @@ export function AdminDashboard({ onLogout }) {
         <>
           {/* Header */}
           <div className="bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="font-semibold text-gray-900">Safora</h1>
-              <p className="text-sm text-gray-500">Safety Management Dashboard</p>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between py-4">
+                <div className="flex items-center gap-3">
+                  <Button variant="ghost" size="sm">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                  <div>
+                    <h1 className="font-semibold text-gray-900">Safora</h1>
+                    <p className="text-sm text-gray-500">Safety Management Dashboard</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm">
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={onLogout}>
+                    <User className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onLogout}>
-              <User className="h-5 w-5" />
-            </Button>
+
+          {/* Navigation Tabs */}
+          <div className="bg-white border-b">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex overflow-x-auto justify-evenly">
+                {[
+                  { id: 'overview', label: 'Overview', icon: BarChart3 },
+                  { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+                  { id: 'users', label: 'Users', icon: Users },
+                  { id: 'geofencing', label: 'Geofencing', icon: Map },
+                  { id: 'settings', label: 'Settings', icon: Settings }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-3 border-b-2 whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'border-emerald-600 text-emerald-600'
+                        : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Navigation Tabs */}
-      <div className="bg-white border-b">
-        <div className="flex overflow-x-auto">
-          {[
-            { id: 'overview', label: 'Overview', icon: BarChart3 },
-            { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
-            { id: 'users', label: 'Users', icon: Users },
-            { id: 'geofencing', label: 'Geofencing', icon: Map },
-            { id: 'settings', label: 'Settings', icon: Settings }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 border-b-2 whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-emerald-600 text-emerald-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="p-4">
-        {activeTab === 'overview' && renderOverview()}
-        {activeTab === 'alerts' && renderAlerts()}
-        {activeTab === 'users' && renderUsers()}
-        {activeTab === 'geofencing' && renderGeofencing()}
-        {activeTab === 'settings' && (
-          <Card className="p-4">
-            <h3 className="font-semibold mb-4">Settings</h3>
-            <p className="text-gray-600">Settings panel coming soon...</p>
-          </Card>
-        )}
-      </div>
-      </>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            {activeTab === 'overview' && renderOverview()}
+            {activeTab === 'alerts' && renderAlerts()}
+            {activeTab === 'users' && renderUsers()}
+            {activeTab === 'geofencing' && renderGeofencing()}
+            {activeTab === 'settings' && (
+              <Card className="p-6">
+                <h3 className="font-semibold mb-4">Settings</h3>
+                <p className="text-gray-600">Settings panel coming soon...</p>
+              </Card>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
